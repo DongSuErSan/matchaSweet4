@@ -1,0 +1,56 @@
+{% extends 'home.html' %}
+
+{% block style %}
+
+{% endblock %}
+
+{% block container %}
+
+    <el-descriptions class="margin-top" title="shopCart" :column="5" border>
+        {% for shop in shop_list %}
+            <el-descriptions-item>
+                <template slot="label">
+                    <i class="el-icon-user"></i>
+                    name
+                </template>
+                {{ shop.shop_name }}
+            </el-descriptions-item>
+            <el-descriptions-item>
+                <template slot="label">
+                    <i class="el-icon-mobile-phone"></i>
+                    inventory
+                </template>
+                {{ shop.number }}
+            </el-descriptions-item>
+            <el-descriptions-item>
+                <template slot="label">
+                    <i class="el-icon-mobile-phone"></i>
+                    price
+                </template>
+                {{ shop.price }}
+            </el-descriptions-item>
+            <el-descriptions-item>
+                <template slot="label">
+                    <i class="el-icon-location-outline"></i>
+                    purchase quantity
+                </template>
+                <el-input v-model="shop_number"></el-input>
+            </el-descriptions-item>
+            <el-descriptions-item>
+                <template slot="label">
+                    <i class="el-icon-office-building"></i>
+                    operation
+                </template>
+                <el-button type="primary" size="small" @click="shopDetails('{{ shop.nid }}')"
+                           style="margin-left: 20px">view
+                </el-button>
+
+                <el-button type="success" size="small" @click="buyNow(`{{ shop.nid }}`)">buy</el-button>
+
+                <el-button type="danger" size="small" @click="deleteShop(`{{ shop.nid }}`)">delete</el-button>
+            </el-descriptions-item>
+
+        {% endfor %}
+
+    </el-descriptions>
+{% endblock %}

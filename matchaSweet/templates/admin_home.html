@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ch">
+<head>
+    <meta charset="UTF-8">
+    <title>console</title>
+    <link rel="stylesheet" href="/static/css/admin_home.css">
+    <link rel="stylesheet" href="/static/font-awesome-4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+<div id="app">
+    <div class="actions">
+        <span :class="menu === 'home' ? 'active item' : 'item'" @click="set_menu('home')">console</span>
+        <span :class="menu === 'version' ? 'active item' : 'item'" @click="set_menu('version')">order</span>
+        <span :class="menu === 'info' ? 'active item' : 'item'" @click="set_menu('info')">sales</span>
+    </div>
+    <main class="home" v-show="menu==='home'">
+        <div class="title">
+            <div class="item tea">
+                <div class="left">
+                    <i class="fa fa-user-circle-o"></i>
+                </div>
+                <div class="right">
+                    <h3>{{ user_count }}</h3>
+                    <p>user count</p>
+                </div>
+            </div>
+            <div class="item yellow">
+                <div class="left">
+                    <i class="fa fa-share-alt-square"></i>
+                </div>
+                <div class="right">
+                    <h3>{{ img_list }}</h3>
+                    <p>image count</p>
+                </div>
+            </div>
+            <div class="item red">
+                <div class="left">
+                    <i class="fa fa-internet-explorer"></i>
+                </div>
+                <div class="right">
+                    <h3>{{ shop_count }}</h3>
+                    <p>shop count</p>
+                </div>
+            </div>
+            <div class="item green">
+                <div class="left">
+                    <i class="fa fa-handshake-o"></i>
+                </div>
+                <div class="right">
+                    <h3>{{ comment_count }}</h3>
+                    <p>comment count</p>
+                </div>
+            </div>
+            <div class="item blue">
+                <div class="left">
+                    <i class="fa fa-pinterest-square"></i>
+                </div>
+                <div class="right">
+                    <h3>{{ order_count }}</h3>
+                    <p>order count</p>
+                </div>
+            </div>
+        </div>
+        <div class="content">
+            <div class="charts" id="main">
+
+            </div>
+            <div class="data_s">
+                <div class="item">
+                    <span class="new">real time</span>
+                    <div class="left">
+                        <i class="fa fa-odnoklassniki-square"></i>
+                    </div>
+                    <div class="right">
+                        <h4>{{ online_count }}</h4>
+                        <p>online number</p>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="left">
+                        <i class="fa fa-user"></i>
+                    </div>
+                    <div class="right">
+                        <h4>{{ today_sign }}</h4>
+                        <p>today sign</p>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="left">
+                        <i class="fa fa-envelope"></i>
+                    </div>
+                    <div class="right">
+                        <h4>{{ today_order }}</h4>
+                        <p>today order</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <main class="version" v-show="menu==='version'">
+        <div class="title">
+            <span>System</span>
+            <span>sales</span>
+        </div>
+        <div class="content">
+            <div class="charts" id="main1" style="height: 370px; margin-top: 20px">
+
+            </div>
+        </div>
+    </main>
+    <main class="version" v-show="menu==='info'">
+        <div class="title">
+            <span>System</span>
+            <span>seven day sales</span>
+        </div>
+        <div class="content">
+            <div class="charts" id="main2" style="height: 370px; margin-top: 20px">
+
+            </div>
+        </div>
+    </main>
+
+</div>
+<script src="/static/vue/vue.js"></script>
+<script src="/static/echarts/echarts.js"></script>
+<script src="/static/utils/poetry.js" charset="utf-8"></script>
+<script src="/static/jquery/jquery.min.js"></script>
+
+<script>
+    function randomNum(minNum, maxNum) {
+        switch (arguments.length) {
+            case 1:
+                return parseInt(Math.random() * minNum + 1, 10);
+                break;
+            case 2:
+                return parseInt(Math.random() * (maxNum - minNum + 1) + minNum, 10);
+                break;
+            default:
+                return 0;
+                break;
+        }
+    }
+
+    function init_echarts_user(seven_data) {
+        // -----------  echarts  ----------- //
+
+        let chartDom = document.getElementById('main');
+        let myChart = echarts.init(chartDom);
+        let option;
+        option = {
+            title: {
+                text: 'seven day user'
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross',
+                    label: {
+                        backgroundColor: '#6a7985'
+                    }
+                }
+            },
+            legend: {
+                data: ['login', 'sign']
+            },
+            toolbox: {},
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: [
+                {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: seven_data['date']
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value'
+                }
+            ],
+            series: [
+                {
+                    name: 'Login',
+                    type: 'line',
+                    stack: 'Total',
+                    areaStyle: {},
+                    smooth: true,
+                    emphasis: {
+                        focus: 'series'
+                    },
+                    data: seven_data['login_data']
+                },
+                {
+                    name: 'Sign',
+                    type: 'line',
+                    stack: 'Total',
+                    smooth: true,
+                    areaStyle: {},
+                    emphasis: {
+                        focus: 'series'
+                    },
+                    data: seven_data['sign_data']
+                },
+            ]
+        };
+
+        window.onresize = () => {
+            myChart.resize();
+        }
+        option && myChart.setOption(option);
+    }
+
+    function init_echarts_order(order_data) {
+        var myChart = echarts.init(document.getElementById('main1'));
+
+        var option = {
+            title: {
+                text: 'shop statistical'
+            },
+            tooltip: {},
+            legend: {
+                data: ['sales']
+            },
+            xAxis: {
+                data: order_data['name']
+            },
+            yAxis: {},
+            series: [{
+                name: 'sales',
+                type: 'bar',
+                data: order_data['number']
+            }]
+        };
+
+        myChart.setOption(option);
+    }
+
+    function init_echarts_seven_order(seven_order_data) {
+        // -----------  echarts  ----------- //
+
+        let chartDom = document.getElementById('main2');
+        let myChart = echarts.init(chartDom);
+        let option;
+        option = {
+            title: {
+                text: 'seven day sales'
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross',
+                    label: {
+                        backgroundColor: '#6a7985'
+                    }
+                }
+            },
+            legend: {
+                data: ['order count']
+            },
+            toolbox: {},
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: [
+                {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: seven_order_data['date']
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value'
+                }
+            ],
+            series: [
+                {
+                    name: '订单数量',
+                    type: 'line',
+                    stack: 'Total',
+                    areaStyle: {},
+                    smooth: true,
+                    emphasis: {
+                        focus: 'series'
+                    },
+                    data: seven_order_data['number']
+                },
+            ]
+        };
+        window.onresize = () => {
+            myChart.resize();
+        }
+        option && myChart.setOption(option);
+    }
+
+    function init_seven_data() {
+        $.get('/api/get_seven_data', (res) => {
+            init_echarts_user(res)
+        })
+    }
+
+    function init_order_data() {
+        $.get('/api/get_order_data', (res) => {
+            init_echarts_order(res)
+        })
+    }
+
+    function init_seven_order() {
+        $.get('/api/get_seven_order/', (res) => {
+            init_echarts_seven_order(res)
+        })
+    }
+
+    let timer = null;
+    new Vue({
+        el: '#app',
+        delimiters: ["[[", "]]"],
+        data: {
+            menu: 'home',
+            poetry: {
+                content: '',
+                info: '',
+            },
+            btn_status: true,
+
+        },
+        created() {
+            this.reset_word()
+            this.init_menu()
+        },
+        methods: {
+            init_menu() {
+                let menu = localStorage.getItem('menu')
+                if (menu === 'home') {
+                    this.init_online()
+                }
+                if (menu) {
+                    this.menu = menu
+                }
+            },
+            set_menu(menu) {
+                this.menu = menu
+                if (menu === 'home') {
+                    setTimeout(() => {
+                        myChart.resize()
+                    }, 200)
+                    this.init_online()
+                } else {
+                    clearInterval(timer)
+                }
+                localStorage.setItem('menu', menu)
+                location.reload()
+            },
+            reset_word() {
+                if (this.btn_status) {
+                    this.btn_status = false
+                    jinrishici.load((result) => {
+                        let poem = result.data.content;
+                        let info = "【" + result.data.origin.dynasty + "】" + result.data.origin.author + "《" + result.data.origin.title + "》";
+                        this.poetry.content = poem
+                        this.poetry.info = info
+                    })
+                }
+                setTimeout(() => {
+                    this.btn_status = true
+                }, 4000)
+            },
+            get_online() {
+                this.online_count = randomNum(1, 23)
+            },
+            init_online() {
+                this.get_online()
+                timer = setInterval(this.get_online, 1000)
+            }
+        },
+    })
+
+    init_seven_data()
+    init_order_data()
+    init_seven_order()
+
+</script>
+</body>
+</html>

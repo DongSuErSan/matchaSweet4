@@ -1,0 +1,27 @@
+{% extends 'home.html' %}
+
+{% block container %}
+    {% if not flag %}
+        <el-empty :image-size="200"></el-empty>
+    {% endif %}
+
+    <el-row :gutter="30">
+        {% for shop in shop_list %}
+            <el-col>
+                <el-card :body-style="{ padding: '0px' }">
+                    <img src="{{ shop.avatar.url.url }}"
+                         class="image">
+                    <div style="padding: 14px;">
+                        <span>{{ shop.shop_name }}</span>
+                        <div class="bottom clearfix">
+                            <time class="time">{{ shop.create_date }}</time>
+                            <el-button type="text" class="button" @click="shopDetails('{{ shop.nid }}')">view
+                            </el-button>
+                        </div>
+                    </div>
+                </el-card>
+            </el-col>
+        {% endfor %}
+
+    </el-row>
+{% endblock %}

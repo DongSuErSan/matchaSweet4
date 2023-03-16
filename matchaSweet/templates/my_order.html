@@ -1,0 +1,45 @@
+{% extends 'home.html' %}
+
+{% block container %}
+    <el-descriptions class="margin-top" title="order" :column="5" border>
+        {% for order in order_list %}
+            <el-descriptions-item>
+                <template slot="label">
+                    <i class="el-icon-office-building"></i>
+                    serial_number
+                </template>
+                {{ order.nid}}215939860
+            </el-descriptions-item>
+            <el-descriptions-item>
+                <template slot="label">
+                    <i class="el-icon-user"></i>
+                    name
+                </template>
+                {{ order.shop.shop_name }}
+            </el-descriptions-item>
+            <el-descriptions-item>
+                <template slot="label">
+                    <i class="el-icon-price-tag"></i>
+                    order_number
+                </template>
+                {{ order.order_number }}£
+            </el-descriptions-item>
+            <el-descriptions-item>
+                <template slot="label">
+                    <i class="el-icon-warning-outline"></i>
+                    total_price
+                </template>
+                {{ order.total_price }}£
+            </el-descriptions-item>
+            <el-descriptions-item>
+                <template slot="label">
+                    <i class="el-icon-tickets"></i>
+                    create_date
+                </template>
+                {{ order.create_date }}
+            </el-descriptions-item>
+
+        {% endfor %}
+
+    </el-descriptions>
+{% endblock %}

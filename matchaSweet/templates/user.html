@@ -1,0 +1,24 @@
+{% extends 'home.html' %}
+
+{% block container %}
+    <el-form :model="userUpdate" :rules="userRules">
+        {% csrf_token %}
+        <el-form-item label="name" prop="userName">
+            <el-input prop="name" v-model="userUpdate.userName" placeholder="name"></el-input>
+        </el-form-item>
+        <el-form-item label="sex" prop="userSex">
+            <el-input v-model="userUpdate.userSex" placeholder="sex"></el-input>
+        </el-form-item>
+        <el-form-item label="countries" prop="userNation">
+            <el-input v-model="userUpdate.userNation" placeholder="national"></el-input>
+        </el-form-item>
+        <el-form-item label="phone" prop="phone">
+            <el-input v-model="userUpdate.phone" placeholder="phone"></el-input>
+        </el-form-item>
+
+        <el-form-item>
+            <el-button @click="updateUser('{{ request.user.nid }}')" type="success"><span style="color:#fff">submit</span>
+            </el-button>
+        </el-form-item>
+    </el-form>
+{% endblock %}

@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>shop</title>
+    <link rel="stylesheet" href="/static/elementui/theme-chalk/index.css">
+    <link rel="stylesheet" href="/static/css/all.css">
+    <link rel="stylesheet" href="/static/css/shop_details.css">
+</head>
+<body>
+<div id="app">
+    <div class="header">
+        <div class="header-container">
+            <div class="app-name">
+                <a href="/home">Back</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="main-content">
+            <div class="idle-details-container">
+                <div class="details-header">
+                    <div class="details-header-buy">
+                        <div style="color: red;font-size: 18px;font-weight: 600;">Price: £{{ shop_obj.price }}</div>
+
+                        <div style="color: #333;font-size: 18px;font-weight: 600; margin: 0 20px">
+                            inventory: {{ shop_obj.number }}</div>
+
+                        <el-button type="danger" plain
+                                   @click="open('{{ shop_obj.nid }}')" size="small">Buy
+                        </el-button>
+
+                        <el-button type="primary" plain
+                                   @click="addShoppingCart('{{ shop_obj.nid }}')" size="small">AddShopCart
+                        </el-button>
+
+                    </div>
+                </div>
+
+                <div class="details-info">
+                    <div class="details-info-title">{{ shop_obj.shop_name }}</div>
+                    <div class="details-info-main">
+                        {{ shop_obj.details }}
+                    </div>
+                    <div class="details-picture">
+                        <el-image
+                                style="width: 90%;margin-bottom: 2px;"
+                                src="{{ shop_obj.avatar.url.url }}"
+                                fit="contain"></el-image>
+                    </div>
+                </div>
+
+                <div class="message-container" id="replyMessageLocation">
+                    {% csrf_token %}
+                    <div class="message-title">All Comment</div>
+                    <div class="message-send">
+                        <el-input
+                                type="textarea"
+                                autosize
+                                placeholder="comment..."
+                                v-model="messageContent"
+                                maxlength="200"
+                                show-word-limit>
+                        </el-input>
+                        <div class="message-send-button">
+                            <el-button plain @click="addComment('{{ shop_obj.nid }}')">Send Comment</el-button>
+                        </div>
+                    </div>
+                    <div>
+                        {% for comment in comment_list %}
+                            <div class="message-container-list">
+                                <div class="message-container-list-left">
+                                    <el-image
+                                            style="width: 55px; height: 55px;border-radius: 5px;"
+                                            src="/static/img/106.jpg"
+                                            fit="contain"></el-image>
+                                    <div class="message-container-list-text">
+                                        <div class="message-nickname">{{ comment.user.username }}
+                                        </div>
+                                        <div class="message-content">{{ comment.content }}</div>
+                                        <div class="message-time">{{ comment.create_time|date:'Y-m-d' }}</div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        {% endfor %}
+
+                    </div>
+                </div>
+            </div>
+            <div class="foot-container">
+                <div class="author">MatchaSweet<a target="_blank"
+                                                  href="">@Designer</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/static/vue/vue.js"></script>
+<script src="/static/elementui/index.js"></script>
+<script src="/static/axios/axios.min.js"></script>
+<script>
+    axios.interceptors.request.use(
+        request => {
+            if (request.method !== 'get') {
+                let csrf_token = document.querySelector('input[name = "csrfmiddlewaretoken"]').value
+                request.headers['X-CSRFToken'] = csrf_token
+            }
+            return request
+        },
+    )
+    axios.interceptors.response.use(
+        response => {
+            return response.data
+        }
+    )
+
+    new Vue({
+        el: '#app',
+        delimiters: ['[[', ']]'],
+        data() {
+            return {
+                messageContent: ''
+            }
+        },
+
+        methods: {
+            addComment(nid) {
+                axios.post(`/api/comment/${nid}/`, {comment_content: this.messageContent}).then(res => {
+                    if (res.code) {
+                        this.$message.error(res.msg)
+                        return
+                    }
+                    this.$message.success(res.msg)
+                    setTimeout(() => {
+                        location.reload()
+                    }, 1500)
+                })
+            },
+
+            open(nid) {
+                this.$prompt('placeholder number', 'tips', {
+                    confirmButtonText: 'determine',
+                    cancelButtonText: 'cancel',
+                }).then(({value}) => {
+                    if (value <= 0 || isNaN(value * 1)) {
+                        this.$message.error('number error')
+                        return
+                    }
+                    axios.post(`/api/order/${nid}/`, {order_number: value}).then(res => {
+                        if (res.code) {
+                            this.$message.error(res.msg)
+                            return
+                        }
+                        this.$message.success(res.msg)
+                        setTimeout(() => {
+                            location.reload()
+                        }, 1500)
+                    })
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: 'cancel'
+                    });
+                });
+            },
+
+            addShoppingCart(nid) {
+                axios.post(`/api/collects/${nid}/`).then(res => {
+                    if (res.code) {
+                        this.$message.error(res.msg)
+                        return
+                    }
+                    this.$message.success(res.msg)
+                })
+            },
+        }
+    })
+
+</script>
+</body>
+</html>

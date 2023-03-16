@@ -1,0 +1,41 @@
+{% extends 'home.html' %}
+
+{% block style %}
+<style>
+    body, html, #container {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        margin: 0;
+    }
+</style>
+<script type="text/javascript"
+        src="//api.map.baidu.com/api?type=webgl&v=1.0&ak=59qaAPbiyLd8omcEpzQPnvq9K5BivMlk&lang=en"></script>
+{% endblock %}
+
+{% block container %}
+<div id="container"></div>
+{% endblock %}
+
+{% block script %}
+    <script type="text/javascript">
+        var map = new BMapGL.Map("container");
+        map.centerAndZoom(new BMapGL.Point(116.897772493, 36.675411646124), 14);
+        map.enableScrollWheelZoom(true);
+        var geolocation = new BMapGL.Geolocation();
+        geolocation.getCurrentPosition(function (r) {
+            if (this.getStatus() == BMAP_STATUS_SUCCESS) {
+                var mk = new BMapGL.Marker(r.point);
+                map.addOverlay(mk);
+                map.panTo(r.point);
+                var p1 = new BMapGL.Point(r.point.lng, r.point.lat);
+                var p2 = new BMapGL.Point(r.point.lng-0.0200, r.point.lat-0.0200);
+
+                var driving = new BMapGL.DrivingRoute(map, {renderOptions: {map: map, autoViewport: true}});
+                driving.search(p1, p2);
+            } else {
+                alert('failed' + this.getStatus());
+            }
+        });
+    </script>
+{% endblock %}

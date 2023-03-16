@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+    <link rel="stylesheet" href="/static/elementui/theme-chalk/index.css">
+    <link rel="stylesheet" href="/static/css/home.css">
+    {% block style %}
+
+    {% endblock %}
+</head>
+<body>
+<div id="app">
+    <el-container>
+        <el-header>
+            <div class="header">
+                <h1 style="color: #fff">MatchaSweet System</h1>
+                <div class="user">
+                    {% if request.user.username %}
+                        <el-dropdown>
+                            <span class="el-dropdown-link" style="color: #fff">
+                                {{ request.user.username }}<i class="el-icon-arrow-down el-icon--right"></i>
+                            </span>
+                            <el-dropdown-menu slot="dropdown">
+                                {% if request.user.is_superuser %}
+                                    <el-dropdown-item icon="el-icon-user"><a href="/admin">admin</a>
+                                    </el-dropdown-item>
+                                {% endif %}
+
+                                <el-dropdown-item icon="el-icon-switch-button"><a href="/logout">logout</a>
+                                </el-dropdown-item>
+                            </el-dropdown-menu>
+                        </el-dropdown>
+                    {% else %}
+                        <i class="el-icon-user"></i>
+                        <a href="/">Login</a>
+                    {% endif %}
+
+                </div>
+            </div>
+        </el-header>
+        <el-container>
+            <el-aside width="200px">
+                <el-menu
+                        default-active="2"
+                        class="el-menu-vertical-demo">
+                    {% if not user_info.name %}
+                        <el-menu-item index="1" :class="{'active':isActive.indexOf('user') !== -1}">
+                            <i class="el-icon-user"></i>
+                            <a href="/user"><span slot="title">Userinfo</span></a>
+                        </el-menu-item>
+                    {% endif %}
+
+                    {% if user_info.name %}
+                        <el-menu-item index="1" :class="{'active':isActive.indexOf('userinfo') !== -1}">
+                            <i class="el-icon-user"></i>
+                            <a href="/userinfo"><span slot="title">Userinfo</span></a>
+                        </el-menu-item>
+                    {% endif %}
+
+                    <el-menu-item index="2" :class="{'active':isActive.indexOf('home') !== -1}">
+                        <i class="el-icon-s-goods"></i>
+                        <span slot="title"><a href="/home">MatchaShow</a></span>
+                    </el-menu-item>
+
+
+                    <el-menu-item index="3" :class="{'active':isActive.indexOf('search') !== -1}">
+                        <i class="el-icon-search"></i>
+                        <span slot="title"><a href="/search">Search</a></span>
+                    </el-menu-item>
+
+
+                    <el-menu-item index="4" :class="{'active':isActive.indexOf('shopCart') !== -1}">
+                        <i class="el-icon-shopping-cart-full"></i>
+                        <span slot="title"><a href="/shopCart">ShopCart</a></span>
+                    </el-menu-item>
+
+                    <el-menu-item index="5" :class="{'active':isActive.indexOf('my_order') !== -1}">
+                        <i class="el-icon-shopping-bag-2"></i>
+                        <span slot="title"><a href="/my_order">MyOrder</a></span>
+                    </el-menu-item>
+
+                    <el-menu-item index="6" :class="{'active':isActive.indexOf('route') !== -1}">
+                        <i class="el-icon-map-location"></i>
+                        <span slot="title"><a href="/route">Location</a></span>
+                    </el-menu-item>
+                </el-menu>
+            </el-aside>
+            <el-container>
+                <el-main>
+                    {% csrf_token %}
+                    {% block container %}
+                        <el-row :gutter="30">
+                            {% for shop in shop_list %}
+                                <el-col>
+                                    <el-card :body-style="{ padding: '0px' }">
+                                        <img src="{{ shop.avatar.url.url }}"
+                                             class="image">
+                                        <div style="padding: 14px;">
+                                            <span>{{ shop.shop_name }}</span>
+                                            <div class="bottom clearfix">
+                                                <time class="time">{{ shop.create_date }}</time>
+                                                <el-button type="text" class="button"
+                                                           @click="shopDetails('{{ shop.nid }}')">view
+                                                </el-button>
+                                            </div>
+                                        </div>
+                                    </el-card>
+                                </el-col>
+                            {% endfor %}
+
+                        </el-row>
+                    {% endblock %}
+                </el-main>
+                <el-footer><h1 style="color: #fff">Welcome to MatchaSweet System</h1></el-footer>
+            </el-container>
+        </el-container>
+    </el-container>
+</div>
+
+<script src="/static/vue/vue.js"></script>
+<script src="/static/elementui/index.js"></script>
+<script src="/static/axios/axios.min.js"></script>
+
+{% block lm %}
+
+{% endblock %}
+
+<script>
+    axios.interceptors.request.use(
+        request => {
+            if (request.method === 'post') {
+                let csrf_token = document.querySelector('input[name = "csrfmiddlewaretoken"]').value
+                request.headers['X-CSRFToken'] = csrf_token
+            }
+            return request
+        },
+    )
+    axios.interceptors.response.use(
+        response => {
+            return response.data
+        }
+    )
+
+    new Vue({
+        el: '#app',
+        delimiters: ['[[', ']]'],
+        data() {
+            return {
+                userUpdate: {
+                    nid: 1,
+                    userName: '',
+                    userSex: '',
+                    userNation: '',
+                    phone: '',
+                },
+
+                userRules: {
+
+                    userName: [
+                        {required: true, message: 'placeholder username', trigger: 'blur'}
+                    ],
+
+                    userSex: [
+                        {required: true, message: 'placeholder sex', trigger: 'blur'}
+                    ],
+
+                    userNation: [
+                        {required: true, message: 'placeholder national', trigger: 'blur'}
+                    ],
+
+                    phone: [
+                        {required: true, message: 'placeholder phone', trigger: 'blur'}
+                    ],
+
+                },
+                search: '',
+                avatar_list_headers: {},
+                tableData: [],
+                shop_number: 1
+            }
+        },
+
+        computed: {
+            isActive() {
+                return location.href
+            }
+        },
+
+        mounted() {
+            if (location.href.indexOf('my_order') !== -1) {
+                let box = document.getElementById('myOrder')
+                let tableData = box.getAttribute('data-order')
+                console.log(tableData)
+                this.tableData = eval(tableData)
+            }
+        },
+
+        created() {
+
+        },
+
+        methods: {
+            get_new_data(id, name, url, flag, size) {
+                this.news_active = name
+                this.news_active_url = url
+                let data = {
+                    id,
+                }
+                if (size) {
+                    data.size = size
+                }
+                axios.post('/api/news/', data, {
+                    headers: {
+                        signaturekey: Lm(),
+                    }
+                }).then(res => {
+                    this.news_list = res.data
+                })
+            },
+            buyNow(nid) {
+                if (this.shop_number <= 0 || isNaN(this.shop_number * 1)) {
+                    this.$message.error('number error')
+                    return
+                }
+                axios.post(`/api/order/${nid}/`, {order_number: this.shop_number}).then(res => {
+                    if (res.code) {
+                        this.$message.error(res.msg)
+                        return
+                    }
+                    this.$message.success(res.msg)
+                    setTimeout(() => {
+                        location.reload()
+                    }, 1500)
+                })
+            },
+
+
+            getShopInfo() {
+                window.open('/search_shop?key=' + this.search)
+            },
+
+
+            updateUser(nid) {
+                this.userUpdate.nid = nid
+                axios.put(`/api/userlur/`, this.userUpdate).then(res => {
+                    if (res.code !== 200) {
+                        this.$message.error(res.msg)
+                        return
+                    }
+                    this.$message.success(res.msg)
+                    setTimeout(() => {
+                        location.href = '/userinfo'
+                    }, 1000)
+                })
+            },
+
+
+            avatar_list_upload() {
+                let csrf_token = document.querySelector('input[name = "csrfmiddlewaretoken"]').value
+                this.avatar_list_headers['X-CSRFToken'] = csrf_token
+            },
+
+            avatar_list_success(res) {
+                if (!res.code) {
+                    // {#this.$message.success(res.msg)#}
+                    return
+                }
+                this.$message.error(res.msg)
+            },
+
+
+            shopDetails(nid) {
+                location.href = `/shop/${nid}`
+            },
+
+            deleteShop(nid) {
+                axios.delete(`/api/collects/${nid}/`).then(res => {
+                    if (res.code) {
+                        this.$message.error(res.msg)
+                        return
+                    }
+                    this.$message.success(res.msg)
+                    setTimeout(() => {
+                        location.reload()
+                    }, 1500)
+
+                })
+            },
+
+            open_top() {
+                this.$prompt('placeholder amount', 'tips', {
+                    confirmButtonText: 'determine',
+                    cancelButtonText: 'cancel',
+                }).then(({value}) => {
+                    axios.post('/api/userlur/', {value: value}).then(res => {
+                    if (res.code !== 200) {
+                        this.$message.error(res.msg)
+                        return
+                    }
+                    this.$message.success(res.msg)
+                    setTimeout(() => {
+                        location.reload()
+                    }, 1000)
+                })
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: 'cancel'
+                    });
+                });
+            }
+
+        }
+
+    })
+</script>
+</body>
+</html>
+
+{% block script %}
+
+{% endblock %}

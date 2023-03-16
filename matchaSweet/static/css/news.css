@@ -1,0 +1,72 @@
+a {
+  color: #333;
+}
+
+.right {
+  width: 80%;
+  padding: 20px;
+}
+.right .title {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #f0eeee;
+  padding-bottom: 10px;
+}
+.right .title img {
+  width: 35px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+.right .title h2 {
+  font-size: 20px;
+}
+.right .body {
+  margin-top: 10px;
+}
+.right .body ul {
+  list-style: none;
+}
+.right .body ul li {
+  height: 30px;
+  align-items: center;
+  display: flex;
+  font-size: 14px;
+}
+.right .body ul li:nth-child(1) .index {
+  background-color: #fe2d46;
+  color: white;
+}
+.right .body ul li:nth-child(2) .index {
+  background-color: #ff6600;
+  color: white;
+}
+.right .body ul li:nth-child(3) .index {
+  background-color: #faa90e;
+  color: white;
+}
+.right .body ul li .index {
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  color: #333333;
+  background-color: #f0f1f4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20px;
+}
+.right .body ul li a {
+  width: 77%;
+  color: #333333;
+  transition: all 0.2s;
+}
+.right .body ul li a:hover {
+  color: #3a8ee6;
+}
+.right .body ul li .num {
+  width: 20%;
+  display: flex;
+  justify-content: right;
+}
+
+/*# sourceMappingURL=news.css.map */
